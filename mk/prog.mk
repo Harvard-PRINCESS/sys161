@@ -1,5 +1,5 @@
 #
-# Makefile fragment for building disk161
+# Makefile fragment for building programs
 #
 
 all: $(PROG)
@@ -7,15 +7,12 @@ all: $(PROG)
 include rules.mk
 include depend.mk
 
-CFLAGS+=-I.
-SRCFILES+=disktool  disk161.c
-
 distclean clean:
 	rm -f *.o $(PROG)
 
 rules:
 	@echo Making rules...
-	@echo $(SRCFILES) | $S/makerules.sh > rules.mk
+	@echo $(SRCLIST) | $S/mk/makerules.sh > rules.mk
 
 depend:
 	$(MAKE) rules
@@ -27,7 +24,7 @@ realdepend:
 install:
 	(umask 022; \
 		[ -d "$(DESTDIR)$(BINDIR)" ] || mkdir -p $(DESTDIR)$(BINDIR))
-	$S/installit.sh "$(DESTDIR)$(BINDIR)" "$(PROG)" "$(VERSION)"
+	$S/mk/installit.sh "$(DESTDIR)$(BINDIR)" "$(PROG)" "$(VERSION)"
 
 $(PROG): $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) $(LIBS) -lm -o $(PROG)

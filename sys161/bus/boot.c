@@ -135,11 +135,9 @@ load_elf(int fd)
 			ph.p_filesz = ph.p_memsz;
 		}
 
-#ifdef USE_TRACE
 		if (ph.p_flags & PF_X) {
 			prof_addtext(ph.p_vaddr, ph.p_memsz);
 		}
-#endif
 
 		doread(fd, ph.p_offset, ram+paddr, ph.p_filesz);
 		bzero(ram+paddr+ph.p_filesz, ph.p_memsz - ph.p_filesz);

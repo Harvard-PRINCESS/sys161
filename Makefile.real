@@ -1,6 +1,7 @@
+include $S/mk/setup.mk
+
 all depend install tidy clean:
 	(cd build-sys161 && $(MAKE) $@)
-	(cd build-trace161 && $(MAKE) $@)
 	(cd build-stat161 && $(MAKE) $@)
 	(cd build-hub161 && $(MAKE) $@)
 	(cd build-disk161 && $(MAKE) $@)

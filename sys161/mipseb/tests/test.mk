@@ -9,7 +9,7 @@ TARGETFLAGS=-O2 -Wall -W -Werror -nostdinc -nostdlib \
 SYS161=../build-trace161/trace161
 SYS161FLAGS=-tkujtxi -c$T/sys161.conf -X
 
-T=$S/mipseb/tests
+T=$S/sys161/mipseb/tests
 
 all:
 	$(MAKE) check

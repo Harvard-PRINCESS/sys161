@@ -1,3 +1,7 @@
+20171105 dholland	Do both tracing and non-tracing cpus in one build.
+20171105 dholland	Reorganize source tree and build system.
+20170907 dholland	Set t9 on kernel entry in case the kernel image is PIC.
+
 20160301 dholland	System/161 2.0.8 released.
 20160301 dholland	Update copyright years. Noticed by Margo Seltzer.
 20160229 dholland	Fix handling of file creation in emufs, again.

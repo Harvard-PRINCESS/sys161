@@ -17,8 +17,6 @@
 #include "prof.h"
 
 
-#ifdef USE_TRACE
-
 #define PROFILE_FILE "gmon.out"
 #define PROFILE_HZ (1000000000/PROFILE_NSECS)
 
@@ -298,4 +296,3 @@ prof_setup(void)
 		       "profiling sampler");
 }
 
-#endif /* USE_TRACE */

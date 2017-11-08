@@ -11,7 +11,7 @@
 #endif
 
 void console_earlyinit(void);
-void console_init(int pass_sigs);
+void console_init(int pass_sigs, int do_tracing);
 void console_cleanup(void);
 
 void console_beep(void);

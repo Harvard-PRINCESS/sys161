@@ -44,6 +44,9 @@ void cpudebug_get_bp_region(uint32_t *start, uint32_t *end);
 void cpudebug_getregs(unsigned cpunum, uint32_t *regs, int maxregs,
 		      int *nregs);
 
+/* Functions used by the tracing code */
+void cpu_set_tracing(int on);
+
 /* Functions used by the profiling code */
 uint32_t cpuprof_sample(void);
 

@@ -4,8 +4,6 @@
 #ifndef TRACE_H
 #define TRACE_H
 
-#ifdef USE_TRACE
-
 #define DOTRACE_KINSN	0	/* trace instructions in kernel mode */
 #define DOTRACE_UINSN	1	/* trace instructions in user mode */
 #define DOTRACE_JUMP	2	/* trace jump instructions */
@@ -40,27 +38,8 @@ void hwtracel(const char *fmt, ...) PF(1,2);
 void cputrace(unsigned cpunum, const char *fmt, ...) PF(2,3);
 void cputracel(unsigned cpunum, const char *fmt, ...) PF(2,3);
 
-
-#define CPUTRACEL(k, cn, ...) \
-	(g_traceflags[(k)] ? cputracel(cn, __VA_ARGS__) : (void)0)
-#define CPUTRACE(k, cn, ...)  \
-	(g_traceflags[(k)] ? cputrace(cn, __VA_ARGS__) : (void)0)
-
 #define HWTRACEL(k, ...)   (g_traceflags[(k)] ? hwtracel(__VA_ARGS__): (void)0)
 #define HWTRACE(k, ...)    (g_traceflags[(k)] ? hwtrace(__VA_ARGS__) : (void)0)
 
-
-
-#else /* not USE_TRACE */
-
-
-#define CPUTRACEL(k, ...)
-#define CPUTRACE(k, ...)
-
-#define HWTRACEL(k, ...)
-#define HWTRACE(k, ...)
-
-
-#endif /* USE_TRACE */
 
 #endif /* TRACE_H */

@@ -243,9 +243,7 @@ main_dumpstate(void)
 {
 	msg("mainloop: shutoff_flag %d stopped_in_debugger %d",
 	    shutoff_flag, stopped_in_debugger);
-#ifdef USE_TRACE
 	print_traceflags();
-#endif
 	gdb_dumpstate();
 	showstats();
 	clock_dumpstate();
@@ -363,21 +361,12 @@ usage(void)
 	msg("     -c config      Use alternate config file");
 	msg("     -C slot:arg    Override config file argument");
 	msg("     -D count       Set disk I/O doom counter");
-#ifdef USE_TRACE
 	msg("     -f file        Trace to specified file");
 	msg("     -P             Collect kernel execution profile");
-#else
-	msg("     -f file        (trace161 only)");
-	msg("     -P             (trace161 only)");
-#endif
 	msg("     -p port        Listen for gdb over TCP on specified port");
 	msg("     -s             Pass signal-generating characters through");
-#ifdef USE_TRACE
 	msg("     -t[kujtxidne]  Set tracing flags");
 	print_traceflags_usage();
-#else
-	msg("     -t[flags]      (trace161 only)");
-#endif
 	msg("     -w             Wait for debugger before starting");
 	msg("     -X             Don't wait for debugger; exit instead");
 	msg("     -Z seconds     Set watchdog timer to specified time");
@@ -400,10 +389,9 @@ main(int argc, char *argv[])
 	size_t argsize=0;
 	int debugwait=0;
 	int pass_signals=0;
+	int console_tracing=0;
 	int timeout;
-#ifdef USE_TRACE
 	int profiling=0;
-#endif
 	int doom = 0;
 	unsigned ncpus;
 
@@ -434,21 +422,16 @@ main(int argc, char *argv[])
 			break;
 		    case 'D': doom = atoi(myoptarg); break;
 		    case 'f':
-#ifdef USE_TRACE
 			set_tracefile(myoptarg);
-#endif
 			break;
 		    case 'p': port = atoi(myoptarg); usetcp=1; break;
 		    case 'P':
-#ifdef USE_TRACE
 			profiling = 1;
-#endif
 			break;
 		    case 's': pass_signals = 1; break;
 		    case 't': 
-#ifdef USE_TRACE
 			set_traceflags(myoptarg); 
-#endif
+			console_tracing = 1;
 			break;
 		    case 'w': debugwait = 1; break;
 		    case 'X': no_debugger_wait = 1; break;
@@ -485,7 +468,7 @@ main(int argc, char *argv[])
 	/* This must come before bus_config in case a network card needs it */
 	mkdir(".sockets", 0700);
 	
-	console_init(pass_signals);
+	console_init(pass_signals, console_tracing);
 	clock_init();
 	ncpus = bus_config(config, configextra, numconfigextra);
 	if (doom) {
@@ -509,12 +492,10 @@ main(int argc, char *argv[])
 	load_kernel(kernel, argstr);
 
 	msg("System/161 %s, compiled %s %s", VERSION, __DATE__, __TIME__);
-#ifdef USE_TRACE
 	print_traceflags();
 	if (profiling) {
 		prof_setup();
 	}
-#endif
 
 	if (debugwait) {
 		stopped_in_debugger = 1;
@@ -527,9 +508,7 @@ main(int argc, char *argv[])
 
 	run();
 
-#ifdef USE_TRACE
 	prof_write();
-#endif
 
 	bus_cleanup();
 	clock_cleanup();

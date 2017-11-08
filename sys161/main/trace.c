@@ -1,12 +1,12 @@
+#include <sys/types.h>
 #include <stdarg.h>
 #include <string.h>
 #include "config.h"
 
 #include "console.h"
 #include "trace.h"
+#include "cpu.h"
 
-
-#ifdef USE_TRACE
 
 static const struct {
 	int ch;
@@ -30,6 +30,21 @@ static const struct {
 int g_traceflags[NDOTRACES];
 
 static
+void
+update_cpu_tracing(void)
+{
+	int on;
+
+	on = g_traceflags[DOTRACE_KINSN] ||
+		g_traceflags[DOTRACE_UINSN] ||
+		g_traceflags[DOTRACE_JUMP] ||
+		g_traceflags[DOTRACE_TLB] ||
+		g_traceflags[DOTRACE_EXN] ||
+		g_traceflags[DOTRACE_IRQ];
+	cpu_set_tracing(on);
+}
+
+static
 int
 set_traceflag(int ch)
 {
@@ -39,6 +54,7 @@ set_traceflag(int ch)
 		if (flaginfo[j].ch == ch) {
 			f = flaginfo[j].flag;
 			g_traceflags[f] = !g_traceflags[f];
+			update_cpu_tracing();
 			return 0;
 		}
 	}
@@ -53,6 +69,7 @@ adjust_traceflag(int letter, int onoff)
 		if (flaginfo[j].ch == letter) {
 			f = flaginfo[j].flag;
 			g_traceflags[f] = onoff;
+			update_cpu_tracing();
 			return 0;
 		}
 	}
@@ -108,5 +125,3 @@ print_traceflags_usage(void)
 		msg(" %s", flaginfo[i].desc);
 	}
 }
-
-#endif /* USE_TRACE */

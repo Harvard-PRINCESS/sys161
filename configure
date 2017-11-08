@@ -84,7 +84,7 @@ if [ "x$CPU" = x ]; then
     exit 1
 fi
 
-if [ ! -f "${SRCDIR}$CPU/cpuinfo.txt" ]; then
+if [ ! -f "${SRCDIR}sys161/$CPU/cpuinfo.txt" ]; then
     printf "Invalid architecture $CPU (try --help for a list)\n"
     exit 1
 fi
@@ -641,11 +641,11 @@ printf "   $MANDIR\n"
 
 printf 'Creating build directories\n'
 
-for d in sys161 trace161 stat161 hub161 disk161 doc man; do
+for d in sys161 stat161 hub161 disk161 doc man; do
     [ -d build-$d ] || mkdir build-$d
 done
 
-if [ -d ${SRCDIR}$CPU/tests ]; then
+if [ -d ${SRCDIR}sys161/$CPU/tests ]; then
     [ -d test-cpu ] || mkdir test-cpu
 fi
 
@@ -655,178 +655,20 @@ printf 'Generating defs.mk\n'
 
 (
     echo '# Automatically generated file; do not edit'
-    case "$SRCDIR" in
-	"") echo "S=.";;
-	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
-	*) echo "S=$SRCDIR" | sed 's,/$,,';;
-    esac
     echo
-) > defs.mk
-
-########################################
-
-printf 'Generating build-sys161/defs.mk\n'
-
-(
-    echo '# Automatically generated file; do not edit'
     echo "CC=$CC"
     echo "CFLAGS=$CFLAGS $OPT"
     echo "LDFLAGS=$LDFLAGS"
     echo "LIBS=$LIBS"
     echo
-    echo "PROG=sys161"
-    echo
-    echo "DESTDIR=$DESTDIR"
-    echo "BINDIR=$BINDIR"
-    echo
-    case "$SRCDIR" in
-	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
-	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
-    esac
-    echo "CPU=$CPU"
-    echo
-) > build-sys161/defs.mk
-
-########################################
-
-printf 'Generating build-trace161/defs.mk\n'
-
-(
-    echo '# Automatically generated file; do not edit'
-    echo "CC=$CC"
-    echo "CFLAGS=$CFLAGS $OPT -DUSE_TRACE"
-    echo "LDFLAGS=$LDFLAGS"
-    echo "LIBS=$LIBS"
-    echo
-    echo "PROG=trace161"
-    echo
-    echo "DESTDIR=$DESTDIR"
-    echo "BINDIR=$BINDIR"
-    echo
-    case "$SRCDIR" in
-	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
-	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
-    esac
-    echo "CPU=$CPU"
-    echo
-) > build-trace161/defs.mk
-
-########################################
-
-printf 'Generating build-stat161/defs.mk\n'
-
-(
-    echo '# Automatically generated file; do not edit'
-    echo "CC=$CC"
-    echo "CFLAGS=$CFLAGS $OPT"
-    echo "LDFLAGS=$LDFLAGS"
-    echo "LIBS=$LIBS"
-    echo
-    echo "PROG=stat161"
-    echo
-    echo "DESTDIR=$DESTDIR"
-    echo "BINDIR=$BINDIR"
-    echo
-    case "$SRCDIR" in
-	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
-	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
-    esac
-    echo
-) > build-stat161/defs.mk
-
-########################################
-
-printf 'Generating build-hub161/defs.mk\n'
-
-(
-    echo '# Automatically generated file; do not edit'
-    echo "CC=$CC"
-    echo "CFLAGS=$CFLAGS $OPT"
-    echo "LDFLAGS=$LDFLAGS"
-    echo "LIBS=$LIBS"
-    echo
-    echo "PROG=hub161"
-    echo
-    echo "DESTDIR=$DESTDIR"
-    echo "BINDIR=$BINDIR"
-    echo
-    case "$SRCDIR" in
-	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
-	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
-    esac
-    echo
-) > build-hub161/defs.mk
-
-########################################
-
-printf 'Generating build-disk161/defs.mk\n'
-
-(
-    echo '# Automatically generated file; do not edit'
-    echo "CC=$CC"
-    echo "CFLAGS=$CFLAGS $OPT"
-    echo "LDFLAGS=$LDFLAGS"
-    echo "LIBS=$LIBS"
-    echo
-    echo "PROG=disk161"
-    echo
-    echo "DESTDIR=$DESTDIR"
-    echo "BINDIR=$BINDIR"
-    echo
-    case "$SRCDIR" in
-	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
-	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
-    esac
-    echo
-) > build-disk161/defs.mk
-
-########################################
-
-printf 'Generating build-doc/defs.mk\n'
-
-(
     echo "DESTDIR=$DESTDIR"
     echo "BINDIR=$BINDIR"
     echo "EXAMPLEDIR=$EXAMPLEDIR"
     echo "DOCDIR=$DOCDIR"
     echo "MANDIR=$MANDIR"
     echo
-    case "$SRCDIR" in
-	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
-	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
-    esac
-    echo
-) > build-doc/defs.mk
-
-########################################
-
-printf 'Generating build-man/defs.mk\n'
-
-(
-    echo "DESTDIR=$DESTDIR"
-    echo "MANDIR=$MANDIR"
-    echo
-    case "$SRCDIR" in
-	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
-	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
-    esac
-    echo
-) > build-man/defs.mk
-
-########################################
-
-if [ -d ${SRCDIR}$CPU/tests ]; then
-    printf 'Generating test-cpu/defs.mk\n'
-
-    (
-	case "$SRCDIR" in
-	    /*) echo "S=$SRCDIR" | sed 's,/$,,';;
-	    *) echo "S=../$SRCDIR" | sed 's,/$,,';;
-	esac
-	echo "CPU=$CPU"
-	echo
-    ) > test-cpu/defs.mk
-fi
+    echo "CPU=$CPU"
+) > defs.mk
 
 ########################################
 
@@ -834,62 +676,86 @@ printf 'Generating Makefiles\n'
 
 (
     echo '# Automatically generated file - do not edit here'
-    echo 'include defs.mk'
-    echo 'include $S/$(CPU)/cpu.mk'
-    echo 'include $S/version.mk'
-    echo 'include $S/mk/sys161.mk'
+    case "$SRCDIR" in
+	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
+	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
+    esac
+    echo 'BUILDTOP=..'
+    echo 'include $S/sys161/Makefile.real'
 ) > build-sys161/Makefile
-
-cp -f build-sys161/Makefile build-trace161/Makefile
 
 (
     echo '# Automatically generated file - do not edit here'
-    echo 'include defs.mk'
-    echo 'include $S/version.mk'
-    echo 'include $S/mk/stat161.mk'
+    case "$SRCDIR" in
+	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
+	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
+    esac
+    echo 'BUILDTOP=..'
+    echo 'include $S/stat161/Makefile.real'
 ) > build-stat161/Makefile
 
 (
     echo '# Automatically generated file - do not edit here'
-    echo 'include defs.mk'
-    echo 'include $S/version.mk'
-    echo 'include $S/mk/hub161.mk'
+    case "$SRCDIR" in
+	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
+	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
+    esac
+    echo 'BUILDTOP=..'
+    echo 'include $S/hub161/Makefile.real'
 ) > build-hub161/Makefile
 
 (
     echo '# Automatically generated file - do not edit here'
-    echo 'include defs.mk'
-    echo 'include $S/version.mk'
-    echo 'include $S/mk/disk161.mk'
+    case "$SRCDIR" in
+	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
+	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
+    esac
+    echo 'BUILDTOP=..'
+    echo 'include $S/disk161/Makefile.real'
 ) > build-disk161/Makefile
 
 (
     echo '# Automatically generated file - do not edit here'
-    echo 'include defs.mk'
-    echo 'include $S/version.mk'
-    echo 'include $S/mk/doc.mk'
+    case "$SRCDIR" in
+	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
+	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
+    esac
+    echo 'BUILDTOP=..'
+    echo 'include $S/doc/Makefile.real'
 ) > build-doc/Makefile
 
 (
     echo '# Automatically generated file - do not edit here'
-    echo 'include defs.mk'
-    echo 'include $S/version.mk'
-    echo 'include $S/mk/man.mk'
+    case "$SRCDIR" in
+	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
+	*) echo "S=../$SRCDIR" | sed 's,/$,,';;
+    esac
+    echo 'BUILDTOP=..'
+    echo 'include $S/man/Makefile.real'
 ) > build-man/Makefile
 
-if [ -d ${SRCDIR}$CPU/tests ]; then
+if [ -d ${SRCDIR}sys161/$CPU/tests ]; then
     (
 	echo '# Automatically generated file - do not edit here'
-	echo 'include defs.mk'
-	echo 'include $S/version.mk'
-	echo 'include $S/$(CPU)/tests/test.mk'
+	case "$SRCDIR" in
+	    /*) echo "S=$SRCDIR" | sed 's,/$,,';;
+	    *) echo "S=../$SRCDIR" | sed 's,/$,,';;
+	esac
+        echo 'BUILDTOP=..'
+	echo 'CPU='"$CPU" # XXX grr
+	echo 'include $S/sys161/$(CPU)/tests/test.mk'
     ) > test-cpu/Makefile
 fi
 
 (
     echo '# Automatically generated file - do not edit here'
-    echo 'include defs.mk'
-    echo 'include $S/mk/top.mk'
+    case "$SRCDIR" in
+	"") echo "S=.";;
+	/*) echo "S=$SRCDIR" | sed 's,/$,,';;
+	*) echo "S=$SRCDIR" | sed 's,/$,,';;
+    esac
+    echo 'BUILDTOP=.'
+    echo 'include $S/Makefile.real'
 ) > Makefile
 
 ########################################
@@ -897,7 +763,6 @@ fi
 printf 'Generating config.h\n'
 
 cp -f __config.h build-sys161/config.h
-cp -f __config.h build-trace161/config.h
 cp -f __config.h build-stat161/config.h
 cp -f __config.h build-hub161/config.h
 cp -f __config.h build-disk161/config.h
@@ -910,10 +775,8 @@ printf 'Generating cpu-elf.h\n'
 
 (
     echo '/* Automatically generated file - do not edit here */'
-    cat ${SRCDIR}$CPU/cpu-elf.h
+    cat ${SRCDIR}sys161/$CPU/cpu-elf.h
 ) > build-sys161/cpu-elf.h
-
-cp -f build-sys161/cpu-elf.h build-trace161/cpu-elf.h
 
 ########################################
 
@@ -921,9 +784,6 @@ printf 'Generating make rules\n'
 
 (
     cd build-sys161 && touch depend.mk rules.mk && make rules
-)
-(
-    cd build-trace161 && touch depend.mk rules.mk && make rules
 )
 (
     cd build-stat161 && touch depend.mk rules.mk && make rules

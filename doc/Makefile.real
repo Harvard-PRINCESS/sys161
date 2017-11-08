@@ -2,11 +2,10 @@
 # Makefile fragment for installing the docs
 #
 
+include $S/mk/setup.mk
+
 HTML=devices.html gdb.html index.html install.html lamebus.html \
      mips.html networking.html prof.html system.html
-
-
-include defs.mk
 
 all tidy distclean clean rules depend: ;
 
@@ -22,5 +21,5 @@ install:
 	  done
 	cp $S/COPYING $(DESTDIR)$(DOCDIR)/copying.txt
 	chmod 644 $(DESTDIR)$(DOCDIR)/copying.txt
-	cp $S/sys161.conf.sample $(DESTDIR)$(EXAMPLEDIR)/sys161.conf.sample
+	cp $S/doc/sys161.conf.sample $(DESTDIR)$(EXAMPLEDIR)/sys161.conf.sample
 	chmod 644 $(DESTDIR)$(EXAMPLEDIR)/sys161.conf.sample

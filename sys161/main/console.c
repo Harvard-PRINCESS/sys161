@@ -55,9 +55,7 @@ typedef enum {
 } msgtypes;
 
 struct output {
-#ifdef USE_TRACE
 	FILE *f;
-#endif
 	int fd;
 	int needs_close;
 	int is_tty;
@@ -71,10 +69,8 @@ struct output {
 static struct output *o_stdout;
 static struct output *o_stderr;
 
-#ifdef USE_TRACE
 static struct output *o_tracefile;
 static struct output *trace_to;		/* may be any of the three o_* */
-#endif
 
 static int stdin_generates_signals = 0;
 static int stdin_is_tty = 0, stdin_tty_active = 0;
@@ -233,7 +229,7 @@ tty_checkcrs(int fd, int *is_tty, int *needscrs)
 ////////////////////////////////////////////////////////////
 // Output helpers
 
-#ifndef USE_TRACE
+#if 0 /* not currently used */
 static
 size_t
 dowrite(int fd, const char *buf, size_t len)
@@ -267,7 +263,7 @@ writestr(int fd, const char *buf, size_t len)
 		tot += dowrite(fd, buf+tot, len-tot);
 	}
 }
-#endif /* not USE_TRACE */
+#endif /* 0 */
 
 ////////////////////////////////////////////////////////////
 // Common output logic
@@ -283,9 +279,7 @@ output_create(FILE *f, int needs_close)
 		fprintf(stderr, "malloc: Out of memory\n");
 		die();
 	}
-#ifdef USE_TRACE
 	o->f = f;
-#endif
 	o->fd = fileno(f);
 	o->needs_close = needs_close;
 	tty_checkcrs(fileno(f), &o->is_tty, &o->needs_crs);
@@ -299,18 +293,12 @@ static
 void
 output_destroy(struct output *o)
 {
-#ifdef USE_TRACE
 	if (o->f) {
 		fflush(o->f);
 	}
-#endif
 	if (o->needs_close) {
-#ifdef USE_TRACE
 		fclose(o->f);
 		o->f = NULL;
-#else
-		close(o->fd);
-#endif
 		o->fd = -1;
 	}
 	free(o);
@@ -327,12 +315,7 @@ static
 void
 output_putc(struct output *o, int c)
 {
-#ifdef USE_TRACE
 	fputc(c, o->f);
-#else
-	char ch = c;
-	writestr(o->fd, &ch, 1);
-#endif
 }
 
 static
@@ -349,13 +332,7 @@ static
 void
 output_vsay(struct output *o, const char *fmt, va_list ap)
 {
-#ifdef USE_TRACE
 	vfprintf(o->f, fmt, ap);
-#else
-	char buf[4096];
-	vsnprintf(buf, sizeof(buf), fmt, ap);
-	writestr(o->fd, buf, strlen(buf));
-#endif
 }
 
 static
@@ -376,11 +353,9 @@ output_flush(struct output *o)
 		output_eol(o);
 		o->at_bol = 1;
 	}
-#ifdef USE_TRACE
 	if (o->f != NULL) {
 		fflush(o->f);
 	}
-#endif
 }
 
 /*
@@ -461,7 +436,6 @@ output_vmsg(msgtypes mt, unsigned cpunum,
 	o->at_bol = 1;
 }
 
-#ifdef USE_TRACE
 static
 void
 output_msg(msgtypes mt, unsigned cpunum,
@@ -472,7 +446,6 @@ output_msg(msgtypes mt, unsigned cpunum,
 	output_vmsg(mt, cpunum, o, fmt, ap);
 	va_end(ap);
 }
-#endif
 
 ////////////////////////////////////////////////////////////
 // Common input logic
@@ -551,7 +524,6 @@ void
 console_putc(int c)
 {
 	output_char(o_stdout, MT_CONSOLE, 0, c);
-#ifdef USE_TRACE
 	if (o_tracefile) {
 		char tmp[4];
 		int ix=0;
@@ -579,7 +551,6 @@ console_putc(int c)
 			   "`%s' (%d / 0x%x)", tmp, c, c);
 	}
 	fflush(o_stdout->f);
-#endif
 }
 
 void
@@ -587,11 +558,9 @@ console_beep(void)
 {
 	if (o_stdout->is_tty) {
 		console_putc('\a');
-#ifdef USE_TRACE
 		if (o_tracefile) {
 			output_msg(MT_MSG, 0, o_tracefile, "[BEEP]");
 		}
-#endif
 	}
 	else {
 		msg("[BEEP]");
@@ -605,9 +574,7 @@ static
 void
 commondie(int code)
 {
-#ifdef USE_TRACE
 	prof_write();
-#endif
 	console_cleanup();
 	exit(code);
 }
@@ -681,11 +648,9 @@ hang(const char *fmt, ...)  // was crash()
 	if (o_stderr != NULL) {
 		output_flush(o_stderr);
 	}
-#ifdef USE_TRACE
 	if (o_tracefile != NULL) {
 		output_flush(o_tracefile);
 	}
-#endif
 
 	// wait for debugger connection
 	cpu_stopcycling();
@@ -697,8 +662,6 @@ hang(const char *fmt, ...)  // was crash()
 
 ////////////////////////////////////////////////////////////
 // trace output
-
-#ifdef USE_TRACE
 
 void
 set_tracefile(const char *filename)
@@ -765,9 +728,7 @@ hwtracel(const char *fmt, ...)
 	va_end(ap);
 }
 
-#endif
 
-#ifdef USE_TRACE
 /* only useful when tracing to a file */
 static
 void
@@ -827,8 +788,6 @@ console_getsignals(void)
 	 */
 	signal(SIGPIPE, SIG_IGN);
 }
-
-#endif /* USE_TRACE */
 
 ////////////////////////////////////////////////////////////
 // Foreground/background logic
@@ -926,7 +885,6 @@ console_earlyinit(void)
 		o_stderr = output_create(stderr, 0);
 	}
 	
-#ifdef USE_TRACE
 	o_tracefile = NULL;
 	if (o_stderr != NULL) {
 		trace_to = o_stderr;
@@ -934,21 +892,21 @@ console_earlyinit(void)
 	else {
 		trace_to = o_stdout;
 	}
-#endif
 }
 
 void
-console_init(int pass_signals)
+console_init(int pass_signals, int tracing)
 {
 	if (console_up) {
 		smoke("Multiple calls to console_init");
 	}
 
-#ifdef USE_TRACE
-	console_getsignals();
-#else
-	signal(SIGPIPE, SIG_IGN);
-#endif /* USE_TRACE */
+	if (tracing) {
+		console_getsignals();
+	}
+	else {
+		signal(SIGPIPE, SIG_IGN);
+	}
 
 	stdin_generates_signals = !pass_signals;
 	tty_init();
@@ -968,23 +926,19 @@ console_cleanup(void)
 	if (o_stderr != NULL) {
 		output_flush(o_stderr);
 	}
-#ifdef USE_TRACE
 	if (o_tracefile != NULL) {
 		output_flush(o_tracefile);
 	}
-#endif
 	tty_cleanup();
 	if (console_up) {
 		console_up = 0;
 	}
 
-#ifdef USE_TRACE
 	if (o_tracefile != NULL) {
 		output_destroy(o_tracefile);
 		o_tracefile = NULL;
 		trace_to = o_stderr ? o_stderr : o_stdout;
 	}
-#endif
 	if (o_stderr != NULL) {
 		output_destroy(o_stderr);
 		o_stderr = NULL;

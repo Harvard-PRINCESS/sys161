@@ -43,11 +43,7 @@ trace_fetch(unsigned cpunum, void *data, uint32_t offset, uint32_t *ret)
 
 	switch (offset) {
 	    case TRACEREG_PROFEN:
-#ifdef USE_TRACE
 		*ret = prof_isenabled() ? 1 : 0;
-#else
-		*ret = 0;
-#endif
 		break;
 	    default:
 		return -1;
@@ -65,18 +61,14 @@ trace_store(unsigned cpunum, void *data, uint32_t offset, uint32_t val)
 
 	switch (offset) {
 	    case TRACEREG_ON:
-#ifdef USE_TRACE
 		if (adjust_traceflag(val, 1)) {
 			hang("Invalid trace code %c (%d)", val, val);
 		}
-#endif
 		break;
 	    case TRACEREG_OFF:
-#ifdef USE_TRACE
 		if (adjust_traceflag(val, 0)) {
 			hang("Invalid trace code %c (%d)", val, val);
 		}
-#endif
 		break;
 	    case TRACEREG_PRINT:
 		msg("trace: code %lu (0x%lx)", 
@@ -101,19 +93,15 @@ trace_store(unsigned cpunum, void *data, uint32_t offset, uint32_t val)
 		main_enter_debugger(0 /* not lethal */);
 		break;
 	    case TRACEREG_PROFEN:
-#ifdef USE_TRACE
 		if (val) {
 			prof_enable();
 		}
 		else {
 			prof_disable();
 		}
-#endif
 		break;
 	    case TRACEREG_PROFCL:
-#ifdef USE_TRACE
 		prof_clear();
-#endif
 		break;
 	    default:
 		return -1;
